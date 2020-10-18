@@ -16,6 +16,7 @@ class Store{
                 $$state:options.state,
             }
         });
+        this._committing = false;
         this._mutations = options.mutations;
         this._actions = options.actions;
         this.commit = this.commit.bind(this);
@@ -34,12 +35,16 @@ class Store{
         return this._vm._data.$$state;
     }
     set state(v){
-        console.error("不能直接使用",v)
+        if(!this._committing){
+            console.error("不能直接使用",v)
+        }        
     }
     commit(type,payload){
         const entry = this._mutations[type]
         if(entry){
+            this._committing = true
             entry(this.state,payload)
+            this._committing = false
         }
     }
     dispatch(type,payload){
